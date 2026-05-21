@@ -248,8 +248,8 @@
           this.loadCurrentPageMovieSchedule(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageMovieSchedule(currentPage,pageSize,input){
-            let json = await getCurrentPageMovieSchedule(currentPage,pageSize,input);
+          async loadCurrentPageMovieSchedule(currentPage,pageSize,keyword){
+            let json = await getCurrentPageMovieSchedule(currentPage,pageSize,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

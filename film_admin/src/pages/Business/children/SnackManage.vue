@@ -170,9 +170,9 @@
           this.loadCurrentPageSnack(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageSnack(pageNum,limit,input){
+          async loadCurrentPageSnack(pageNum,limit,keyword){
             const cinemaId = this.$cookies.get("cinemaId");
-            let json = await getBSnacks(pageNum,limit,input,cinemaId);
+            let json = await getBSnacks(pageNum,limit,keyword,cinemaId);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

@@ -115,8 +115,8 @@
           this.loadCurrentPageOrder(this.currentPage,8,'');
         },
         methods:{
-          async loadCurrentPageOrder(currentPage,pageSize,input){
-            let json = await getCurrentPageOrder(currentPage,pageSize,input);
+          async loadCurrentPageOrder(currentPage,pageSize,keyword){
+            let json = await getCurrentPageOrder(currentPage,pageSize,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

@@ -428,8 +428,8 @@
           this.loadCurrentPageMovie(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageMovie(pageNum,limit,input){
-            let json = await getCurrentPageMovie(pageNum,limit,input);
+          async loadCurrentPageMovie(pageNum,limit,keyword){
+            let json = await getCurrentPageMovie(pageNum,limit,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               console.log(this.tableData);

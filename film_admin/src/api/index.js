@@ -5,7 +5,7 @@ export const login = (username,password)=>ajax('/admin/user/login',{username,pas
 //获取管理员信息
 // export const getAdminInfo = (adminId)=>ajax('/admin/user/getAdminInfo',{adminId});
 //获取当前页电影
-export const getCurrentPageMovie = (pageNum,limit,input)=>ajax('/admin/movie/getMovies',{pageNum,limit,input});
+export const getCurrentPageMovie = (pageNum,limit,keyword)=>ajax('/admin/movie/getMovies',{pageNum,limit,keyword});
 //上传文件到服务器
 export const upLoadFile = (formData)=>ajax('/admin/movie/upLoadFile',formData,'POST');
 //更新/添加电影信息
@@ -19,7 +19,7 @@ export const getComments = (pageNum,limit,keyword)=>ajax('/admin/comment/getComm
 //删除当前评论
 export const deleteComment = (commentId)=>ajax('/admin/comment/deleteComment',{commentId},'POST');
 //获取当前页用户
-export const getCurrentPageUser = (pageNum,limit,input)=>ajax('/admin/user/getUsers',{pageNum,limit,input});
+export const getCurrentPageUser = (pageNum,limit,keyword)=>ajax('/admin/user/getUsers',{pageNum,limit,keyword});
 //禁用/解禁用户
 export const banUserById = (userId)=>ajax('/admin/user/banUser',{userId},'POST');
 //删除用户信息

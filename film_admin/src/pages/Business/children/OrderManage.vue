@@ -114,9 +114,9 @@
           this.loadCurrentPageOrder(this.currentPage,8,'');
         },
         methods:{
-          async loadCurrentPageOrder(currentPage,pageSize,input){
+          async loadCurrentPageOrder(currentPage,pageSize,keyword){
             const cinemaId = this.$cookies.get("cinemaId");
-            let json = await getCurrentPageBOrder(currentPage,pageSize,input,cinemaId);
+            let json = await getCurrentPageBOrder(currentPage,pageSize,keyword,cinemaId);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;
