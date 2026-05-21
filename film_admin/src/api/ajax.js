@@ -1,6 +1,10 @@
 import axios from 'axios'
 axios.defaults.withCredentials=true
-axios.defaults.baseURL="https://mokespace.cn/weimai";
+if (process.env.NODE_ENV === 'production') {
+  axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'https://mokespace.cn/weimai'
+} else {
+  axios.defaults.baseURL = ''
+}
 
 //封装ajax
 export default function ajax(url='',params={},type='GET'){
