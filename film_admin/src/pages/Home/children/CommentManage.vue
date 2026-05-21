@@ -100,8 +100,8 @@
           this.loadCurrentPageComment(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageComment(currentPage,pageSize,input){
-            let json = await getComments(currentPage,pageSize,input);
+          async loadCurrentPageComment(currentPage,pageSize,keyword){
+            let json = await getComments(currentPage,pageSize,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.tableData.forEach(value => {

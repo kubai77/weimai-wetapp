@@ -1,0 +1,236 @@
+diff --git a/film_admin/src/api/index.js b/film_admin/src/api/index.js
+index bacc64b..e9815b2 100644
+--- a/film_admin/src/api/index.js
++++ b/film_admin/src/api/index.js
+@@ -5,7 +5,7 @@ export const login = (username,password)=>ajax('/admin/user/login',{username,pas
+ //获取管理员信息
+ // export const getAdminInfo = (adminId)=>ajax('/admin/user/getAdminInfo',{adminId});
+ //获取当前页电影
+-export const getCurrentPageMovie = (pageNum,limit,input)=>ajax('/admin/movie/getMovies',{pageNum,limit,input});
++export const getCurrentPageMovie = (pageNum,limit,keyword)=>ajax('/admin/movie/getMovies',{pageNum,limit,keyword});
+ //上传文件到服务器
+ export const upLoadFile = (formData)=>ajax('/admin/movie/upLoadFile',formData,'POST');
+ //更新/添加电影信息
+@@ -19,7 +19,7 @@ export const getComments = (pageNum,limit,keyword)=>ajax('/admin/comment/getComm
+ //删除当前评论
+ export const deleteComment = (commentId)=>ajax('/admin/comment/deleteComment',{commentId},'POST');
+ //获取当前页用户
+-export const getCurrentPageUser = (pageNum,limit,input)=>ajax('/admin/user/getUsers',{pageNum,limit,input});
++export const getCurrentPageUser = (pageNum,limit,keyword)=>ajax('/admin/user/getUsers',{pageNum,limit,keyword});
+ //禁用/解禁用户
+ export const banUserById = (userId)=>ajax('/admin/user/banUser',{userId},'POST');
+ //删除用户信息
+diff --git a/film_admin/src/pages/Business/children/HallManage.vue b/film_admin/src/pages/Business/children/HallManage.vue
+index b351ed9..5165ce6 100644
+--- a/film_admin/src/pages/Business/children/HallManage.vue
++++ b/film_admin/src/pages/Business/children/HallManage.vue
+@@ -206,9 +206,9 @@
+           this.loadCurrentPageHall(this.currentPage,8,'');
+         },
+         methods:{
+-          async loadCurrentPageHall(currentPage,pageSize,input){
++          async loadCurrentPageHall(currentPage,pageSize,keyword){
+             const cinemaId = this.$cookies.get("cinemaId");
+-            let json = await getCurrentPageBHall(currentPage,pageSize,input,cinemaId);
++            let json = await getCurrentPageBHall(currentPage,pageSize,keyword,cinemaId);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Business/children/MovieSchedule.vue b/film_admin/src/pages/Business/children/MovieSchedule.vue
+index 0c6f1e5..856758a 100644
+--- a/film_admin/src/pages/Business/children/MovieSchedule.vue
++++ b/film_admin/src/pages/Business/children/MovieSchedule.vue
+@@ -229,9 +229,9 @@
+           this.loadCurrentPageMovieSchedule(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageMovieSchedule(currentPage,pageSize,input){
++          async loadCurrentPageMovieSchedule(currentPage,pageSize,keyword){
+             const cinemaId = this.$cookies.get("cinemaId");
+-            let json = await getCurrentPageBMovieSchedule(currentPage,pageSize,input,cinemaId);
++            let json = await getCurrentPageBMovieSchedule(currentPage,pageSize,keyword,cinemaId);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Business/children/OrderManage.vue b/film_admin/src/pages/Business/children/OrderManage.vue
+index 347dcd5..ca04395 100644
+--- a/film_admin/src/pages/Business/children/OrderManage.vue
++++ b/film_admin/src/pages/Business/children/OrderManage.vue
+@@ -114,9 +114,9 @@
+           this.loadCurrentPageOrder(this.currentPage,8,'');
+         },
+         methods:{
+-          async loadCurrentPageOrder(currentPage,pageSize,input){
++          async loadCurrentPageOrder(currentPage,pageSize,keyword){
+             const cinemaId = this.$cookies.get("cinemaId");
+-            let json = await getCurrentPageBOrder(currentPage,pageSize,input,cinemaId);
++            let json = await getCurrentPageBOrder(currentPage,pageSize,keyword,cinemaId);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Business/children/SnackManage.vue b/film_admin/src/pages/Business/children/SnackManage.vue
+index 707d8d9..ef8c471 100644
+--- a/film_admin/src/pages/Business/children/SnackManage.vue
++++ b/film_admin/src/pages/Business/children/SnackManage.vue
+@@ -170,9 +170,9 @@
+           this.loadCurrentPageSnack(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageSnack(pageNum,limit,input){
++          async loadCurrentPageSnack(pageNum,limit,keyword){
+             const cinemaId = this.$cookies.get("cinemaId");
+-            let json = await getBSnacks(pageNum,limit,input,cinemaId);
++            let json = await getBSnacks(pageNum,limit,keyword,cinemaId);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/AdminManage.vue b/film_admin/src/pages/Home/children/AdminManage.vue
+index a8fa5a2..36a14ba 100644
+--- a/film_admin/src/pages/Home/children/AdminManage.vue
++++ b/film_admin/src/pages/Home/children/AdminManage.vue
+@@ -138,8 +138,8 @@ export default {
+     this.loadCurrentPageUser(this.currentPage, 8, "");
+   },
+   methods: {
+-    async loadCurrentPageUser(currentPage, pageSize, input) {
+-      let json = await getCurrentPageAdmin(currentPage, pageSize, input);
++    async loadCurrentPageUser(currentPage, pageSize, keyword) {
++      let json = await getCurrentPageAdmin(currentPage, pageSize, keyword);
+       if (json.state === 200) {
+         this.tableData = json.data.beanList;
+         this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/BannerManage.vue b/film_admin/src/pages/Home/children/BannerManage.vue
+index 3659d8a..1f1e0f9 100644
+--- a/film_admin/src/pages/Home/children/BannerManage.vue
++++ b/film_admin/src/pages/Home/children/BannerManage.vue
+@@ -122,8 +122,8 @@
+           this.loadCurrentPageBanner(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageBanner(pageNum,limit,input){
+-            let json = await getBanner(pageNum,limit,input);
++          async loadCurrentPageBanner(pageNum,limit,keyword){
++            let json = await getBanner(pageNum,limit,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/CinemaManage.vue b/film_admin/src/pages/Home/children/CinemaManage.vue
+index 99c0523..f9ec568 100644
+--- a/film_admin/src/pages/Home/children/CinemaManage.vue
++++ b/film_admin/src/pages/Home/children/CinemaManage.vue
+@@ -192,8 +192,8 @@
+           this.loadCurrentPageCinema(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageCinema(currentPage,pageSize,input){
+-            let json = await getCurrentPageCinema(currentPage,pageSize,input);
++          async loadCurrentPageCinema(currentPage,pageSize,keyword){
++            let json = await getCurrentPageCinema(currentPage,pageSize,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/CommentManage.vue b/film_admin/src/pages/Home/children/CommentManage.vue
+index 4d63553..26b3f88 100644
+--- a/film_admin/src/pages/Home/children/CommentManage.vue
++++ b/film_admin/src/pages/Home/children/CommentManage.vue
+@@ -100,8 +100,8 @@
+           this.loadCurrentPageComment(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageComment(currentPage,pageSize,input){
+-            let json = await getComments(currentPage,pageSize,input);
++          async loadCurrentPageComment(currentPage,pageSize,keyword){
++            let json = await getComments(currentPage,pageSize,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.tableData.forEach(value => {
+diff --git a/film_admin/src/pages/Home/children/HallManage.vue b/film_admin/src/pages/Home/children/HallManage.vue
+index ae97657..f377102 100644
+--- a/film_admin/src/pages/Home/children/HallManage.vue
++++ b/film_admin/src/pages/Home/children/HallManage.vue
+@@ -230,8 +230,8 @@
+           this.loadCurrentPageHall(this.currentPage,8,'');
+         },
+         methods:{
+-          async loadCurrentPageHall(currentPage,pageSize,input){
+-            let json = await getCurrentPageHall(currentPage,pageSize,input);
++          async loadCurrentPageHall(currentPage,pageSize,keyword){
++            let json = await getCurrentPageHall(currentPage,pageSize,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/MovieManage.vue b/film_admin/src/pages/Home/children/MovieManage.vue
+index 3284dba..381030d 100644
+--- a/film_admin/src/pages/Home/children/MovieManage.vue
++++ b/film_admin/src/pages/Home/children/MovieManage.vue
+@@ -428,8 +428,8 @@
+           this.loadCurrentPageMovie(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageMovie(pageNum,limit,input){
+-            let json = await getCurrentPageMovie(pageNum,limit,input);
++          async loadCurrentPageMovie(pageNum,limit,keyword){
++            let json = await getCurrentPageMovie(pageNum,limit,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               console.log(this.tableData);
+diff --git a/film_admin/src/pages/Home/children/MovieSchedule.vue b/film_admin/src/pages/Home/children/MovieSchedule.vue
+index 186a81e..534c775 100644
+--- a/film_admin/src/pages/Home/children/MovieSchedule.vue
++++ b/film_admin/src/pages/Home/children/MovieSchedule.vue
+@@ -248,8 +248,8 @@
+           this.loadCurrentPageMovieSchedule(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageMovieSchedule(currentPage,pageSize,input){
+-            let json = await getCurrentPageMovieSchedule(currentPage,pageSize,input);
++          async loadCurrentPageMovieSchedule(currentPage,pageSize,keyword){
++            let json = await getCurrentPageMovieSchedule(currentPage,pageSize,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/OrderManage.vue b/film_admin/src/pages/Home/children/OrderManage.vue
+index d3ad37b..b546aa3 100644
+--- a/film_admin/src/pages/Home/children/OrderManage.vue
++++ b/film_admin/src/pages/Home/children/OrderManage.vue
+@@ -115,8 +115,8 @@
+           this.loadCurrentPageOrder(this.currentPage,8,'');
+         },
+         methods:{
+-          async loadCurrentPageOrder(currentPage,pageSize,input){
+-            let json = await getCurrentPageOrder(currentPage,pageSize,input);
++          async loadCurrentPageOrder(currentPage,pageSize,keyword){
++            let json = await getCurrentPageOrder(currentPage,pageSize,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/SnackManage.vue b/film_admin/src/pages/Home/children/SnackManage.vue
+index dc5160b..5a21bf9 100644
+--- a/film_admin/src/pages/Home/children/SnackManage.vue
++++ b/film_admin/src/pages/Home/children/SnackManage.vue
+@@ -188,8 +188,8 @@
+           this.loadCurrentPageSnack(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageSnack(pageNum,limit,input){
+-            let json = await getSnacks(pageNum,limit,input);
++          async loadCurrentPageSnack(pageNum,limit,keyword){
++            let json = await getSnacks(pageNum,limit,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/UserManage.vue b/film_admin/src/pages/Home/children/UserManage.vue
+index fb9e0af..2c45a07 100644
+--- a/film_admin/src/pages/Home/children/UserManage.vue
++++ b/film_admin/src/pages/Home/children/UserManage.vue
+@@ -116,8 +116,8 @@ export default {
+     this.loadCurrentPageUser(this.currentPage, 8, "");
+   },
+   methods: {
+-    async loadCurrentPageUser(currentPage, pageSize, input) {
+-      let json = await getCurrentPageUser(currentPage, pageSize, input);
++    async loadCurrentPageUser(currentPage, pageSize, keyword) {
++      let json = await getCurrentPageUser(currentPage, pageSize, keyword);
+       if (json.state === 200) {
+         this.tableData = json.data.beanList;
+         this.total = json.data.tr;

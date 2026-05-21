@@ -192,8 +192,8 @@
           this.loadCurrentPageCinema(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageCinema(currentPage,pageSize,input){
-            let json = await getCurrentPageCinema(currentPage,pageSize,input);
+          async loadCurrentPageCinema(currentPage,pageSize,keyword){
+            let json = await getCurrentPageCinema(currentPage,pageSize,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

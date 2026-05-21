@@ -230,8 +230,8 @@
           this.loadCurrentPageHall(this.currentPage,8,'');
         },
         methods:{
-          async loadCurrentPageHall(currentPage,pageSize,input){
-            let json = await getCurrentPageHall(currentPage,pageSize,input);
+          async loadCurrentPageHall(currentPage,pageSize,keyword){
+            let json = await getCurrentPageHall(currentPage,pageSize,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

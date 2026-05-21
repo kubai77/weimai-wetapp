@@ -116,8 +116,8 @@ export default {
     this.loadCurrentPageUser(this.currentPage, 8, "");
   },
   methods: {
-    async loadCurrentPageUser(currentPage, pageSize, input) {
-      let json = await getCurrentPageUser(currentPage, pageSize, input);
+    async loadCurrentPageUser(currentPage, pageSize, keyword) {
+      let json = await getCurrentPageUser(currentPage, pageSize, keyword);
       if (json.state === 200) {
         this.tableData = json.data.beanList;
         this.total = json.data.tr;
