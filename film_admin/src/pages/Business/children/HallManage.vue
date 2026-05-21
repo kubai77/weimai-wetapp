@@ -206,9 +206,9 @@
           this.loadCurrentPageHall(this.currentPage,8,'');
         },
         methods:{
-          async loadCurrentPageHall(currentPage,pageSize,input){
+          async loadCurrentPageHall(currentPage,pageSize,keyword){
             const cinemaId = this.$cookies.get("cinemaId");
-            let json = await getCurrentPageBHall(currentPage,pageSize,input,cinemaId);
+            let json = await getCurrentPageBHall(currentPage,pageSize,keyword,cinemaId);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

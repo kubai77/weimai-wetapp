@@ -188,8 +188,8 @@
           this.loadCurrentPageSnack(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageSnack(pageNum,limit,input){
-            let json = await getSnacks(pageNum,limit,input);
+          async loadCurrentPageSnack(pageNum,limit,keyword){
+            let json = await getSnacks(pageNum,limit,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

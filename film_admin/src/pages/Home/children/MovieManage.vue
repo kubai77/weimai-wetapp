@@ -3,7 +3,7 @@
       <!--搜索-->
       <div class="top">
         <el-col :span="12">
-          <el-input placeholder="请输入内容" v-model="input" class="input-with-select" style="width: 100%">
+          <el-input placeholder="请输入内容" v-model="keyword" class="input-with-select" style="width: 100%">
             <el-button slot="append" icon="el-icon-search" @click="search">搜索</el-button>
           </el-input>
         </el-col>
@@ -428,8 +428,8 @@
           this.loadCurrentPageMovie(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageMovie(pageNum,limit,input){
-            let json = await getCurrentPageMovie(pageNum,limit,input);
+          async loadCurrentPageMovie(pageNum,limit,keyword){
+            let json = await getCurrentPageMovie(pageNum,limit,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               console.log(this.tableData);
@@ -578,7 +578,7 @@
           },
           //搜索电影
           search(){
-            this.searchInput = this.input;
+            this.searchInput = this.keyword;
             this.loadCurrentPageMovie(1,8,this.searchInput);
           },
           //添加电影
