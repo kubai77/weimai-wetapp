@@ -122,8 +122,13 @@
           this.loadCurrentPageBanner(this.currentPage,8,'');
         },
         methods: {
-          async loadCurrentPageBanner(pageNum,limit,input){
-            let json = await getBanner(pageNum,limit,input);
+          //搜索广告
+          search(){
+            this.searchInput = this.keyword;
+            this.loadCurrentPageBanner(1,8,this.searchInput);
+          },
+          async loadCurrentPageBanner(pageNum,limit,keyword){
+            let json = await getBanner(pageNum,limit,keyword);
             if (json.state===200){
               this.tableData = json.data.beanList;
               this.total = json.data.tr;

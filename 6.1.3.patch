@@ -1,0 +1,257 @@
+diff --git a/film_admin/src/api/index.js b/film_admin/src/api/index.js
+index bacc64b..e9815b2 100644
+--- a/film_admin/src/api/index.js
++++ b/film_admin/src/api/index.js
+@@ -5,7 +5,7 @@ export const login = (username,password)=>ajax('/admin/user/login',{username,pas
+ //获取管理员信息
+ // export const getAdminInfo = (adminId)=>ajax('/admin/user/getAdminInfo',{adminId});
+ //获取当前页电影
+-export const getCurrentPageMovie = (pageNum,limit,input)=>ajax('/admin/movie/getMovies',{pageNum,limit,input});
++export const getCurrentPageMovie = (pageNum,limit,keyword)=>ajax('/admin/movie/getMovies',{pageNum,limit,keyword});
+ //上传文件到服务器
+ export const upLoadFile = (formData)=>ajax('/admin/movie/upLoadFile',formData,'POST');
+ //更新/添加电影信息
+@@ -19,7 +19,7 @@ export const getComments = (pageNum,limit,keyword)=>ajax('/admin/comment/getComm
+ //删除当前评论
+ export const deleteComment = (commentId)=>ajax('/admin/comment/deleteComment',{commentId},'POST');
+ //获取当前页用户
+-export const getCurrentPageUser = (pageNum,limit,input)=>ajax('/admin/user/getUsers',{pageNum,limit,input});
++export const getCurrentPageUser = (pageNum,limit,keyword)=>ajax('/admin/user/getUsers',{pageNum,limit,keyword});
+ //禁用/解禁用户
+ export const banUserById = (userId)=>ajax('/admin/user/banUser',{userId},'POST');
+ //删除用户信息
+diff --git a/film_admin/src/pages/Business/children/HallManage.vue b/film_admin/src/pages/Business/children/HallManage.vue
+index b351ed9..5165ce6 100644
+--- a/film_admin/src/pages/Business/children/HallManage.vue
++++ b/film_admin/src/pages/Business/children/HallManage.vue
+@@ -206,9 +206,9 @@
+           this.loadCurrentPageHall(this.currentPage,8,'');
+         },
+         methods:{
+-          async loadCurrentPageHall(currentPage,pageSize,input){
++          async loadCurrentPageHall(currentPage,pageSize,keyword){
+             const cinemaId = this.$cookies.get("cinemaId");
+-            let json = await getCurrentPageBHall(currentPage,pageSize,input,cinemaId);
++            let json = await getCurrentPageBHall(currentPage,pageSize,keyword,cinemaId);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Business/children/MovieSchedule.vue b/film_admin/src/pages/Business/children/MovieSchedule.vue
+index 0c6f1e5..c13327f 100644
+--- a/film_admin/src/pages/Business/children/MovieSchedule.vue
++++ b/film_admin/src/pages/Business/children/MovieSchedule.vue
+@@ -255,7 +255,7 @@
+           },
+           //搜索电影
+           search(){
+-            this.searchInput = this.input;
++            this.searchInput = this.keyword;
+             this.loadCurrentPageMovieSchedule(1,8,this.searchInput);
+           },
+           //新增电影排片
+diff --git a/film_admin/src/pages/Business/children/OrderManage.vue b/film_admin/src/pages/Business/children/OrderManage.vue
+index 347dcd5..ff88806 100644
+--- a/film_admin/src/pages/Business/children/OrderManage.vue
++++ b/film_admin/src/pages/Business/children/OrderManage.vue
+@@ -3,7 +3,7 @@
+     <!--搜索-->
+     <div class="top">
+       <el-col :span="12">
+-        <el-input placeholder="请输入订单号" v-model="input" class="input-with-select" style="width: 100%">
++        <el-input placeholder="请输入订单号" v-model="keyword" class="input-with-select" style="width: 100%">
+           <el-button slot="append" icon="el-icon-search" @click="search">搜索</el-button>
+         </el-input>
+       </el-col>
+diff --git a/film_admin/src/pages/Business/children/SnackManage.vue b/film_admin/src/pages/Business/children/SnackManage.vue
+index 707d8d9..37f7cfb 100644
+--- a/film_admin/src/pages/Business/children/SnackManage.vue
++++ b/film_admin/src/pages/Business/children/SnackManage.vue
+@@ -251,7 +251,7 @@
+           },
+           //搜索小吃
+           search(){
+-            this.searchInput = this.input;
++            this.searchInput = this.keyword;
+             this.loadCurrentPageSnack(1,8,this.searchInput);
+           },
+           //添加小吃
+diff --git a/film_admin/src/pages/Home/children/AdminManage.vue b/film_admin/src/pages/Home/children/AdminManage.vue
+index a8fa5a2..08cfa3b 100644
+--- a/film_admin/src/pages/Home/children/AdminManage.vue
++++ b/film_admin/src/pages/Home/children/AdminManage.vue
+@@ -114,7 +114,7 @@ export default {
+       dialogFormVisible: false,
+       dialogTitle: "",
+       labelPosition: "right",
+-      input: "",
++      keyword: "",
+       searchInput: "",
+       cinemaList: [],
+       roleList: [],
+diff --git a/film_admin/src/pages/Home/children/BannerManage.vue b/film_admin/src/pages/Home/children/BannerManage.vue
+index 3659d8a..90ef6db 100644
+--- a/film_admin/src/pages/Home/children/BannerManage.vue
++++ b/film_admin/src/pages/Home/children/BannerManage.vue
+@@ -122,8 +122,13 @@
+           this.loadCurrentPageBanner(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageBanner(pageNum,limit,input){
+-            let json = await getBanner(pageNum,limit,input);
++          //搜索广告
++          search(){
++            this.searchInput = this.keyword;
++            this.loadCurrentPageBanner(1,8,this.searchInput);
++          },
++          async loadCurrentPageBanner(pageNum,limit,keyword){
++            let json = await getBanner(pageNum,limit,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+diff --git a/film_admin/src/pages/Home/children/CinemaManage.vue b/film_admin/src/pages/Home/children/CinemaManage.vue
+index 99c0523..5e5fbac 100644
+--- a/film_admin/src/pages/Home/children/CinemaManage.vue
++++ b/film_admin/src/pages/Home/children/CinemaManage.vue
+@@ -162,7 +162,7 @@
+             newBrand:'',
+             addBrandId: '',
+             labelPosition:'right',
+-            input:'',
++            keyword:'',
+             searchInput:'',
+             booleanOpitons: [
+               {
+diff --git a/film_admin/src/pages/Home/children/CommentManage.vue b/film_admin/src/pages/Home/children/CommentManage.vue
+index 4d63553..26b3f88 100644
+--- a/film_admin/src/pages/Home/children/CommentManage.vue
++++ b/film_admin/src/pages/Home/children/CommentManage.vue
+@@ -100,8 +100,8 @@
+           this.loadCurrentPageComment(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageComment(currentPage,pageSize,input){
+-            let json = await getComments(currentPage,pageSize,input);
++          async loadCurrentPageComment(currentPage,pageSize,keyword){
++            let json = await getComments(currentPage,pageSize,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.tableData.forEach(value => {
+diff --git a/film_admin/src/pages/Home/children/HallManage.vue b/film_admin/src/pages/Home/children/HallManage.vue
+index ae97657..d69cc83 100644
+--- a/film_admin/src/pages/Home/children/HallManage.vue
++++ b/film_admin/src/pages/Home/children/HallManage.vue
+@@ -297,7 +297,7 @@
+           },
+           //搜索影院
+           search(){
+-            this.searchInput = this.input;
++            this.searchInput = this.keyword;
+             this.loadCurrentPageHall(1,8,this.searchInput);
+           },
+           cancel(){
+diff --git a/film_admin/src/pages/Home/children/MovieManage.vue b/film_admin/src/pages/Home/children/MovieManage.vue
+index 3284dba..8dc3269 100644
+--- a/film_admin/src/pages/Home/children/MovieManage.vue
++++ b/film_admin/src/pages/Home/children/MovieManage.vue
+@@ -304,7 +304,7 @@
+             dialogFormVisible:false,
+             dialogTitle:'',
+             labelPosition:'right',
+-            input:'',
++            keyword:'',
+             searchInput:'',
+             loadingDialogFormVisible:false,
+             rules:{
+diff --git a/film_admin/src/pages/Home/children/MovieSchedule.vue b/film_admin/src/pages/Home/children/MovieSchedule.vue
+index 186a81e..3ec1a12 100644
+--- a/film_admin/src/pages/Home/children/MovieSchedule.vue
++++ b/film_admin/src/pages/Home/children/MovieSchedule.vue
+@@ -274,9 +274,9 @@
+               }
+             });
+           },
+-          //搜索电影
++          //搜索排片
+           search(){
+-            this.searchInput = this.input;
++            this.searchInput = this.keyword;
+             this.loadCurrentPageMovieSchedule(1,8,this.searchInput);
+           },
+           //新增电影排片
+diff --git a/film_admin/src/pages/Home/children/OrderManage.vue b/film_admin/src/pages/Home/children/OrderManage.vue
+index d3ad37b..05c2205 100644
+--- a/film_admin/src/pages/Home/children/OrderManage.vue
++++ b/film_admin/src/pages/Home/children/OrderManage.vue
+@@ -128,7 +128,7 @@
+           },
+           //搜索订单
+           search(){
+-            this.searchInput = this.input;
++            this.searchInput = this.keyword;
+             this.loadCurrentPageOrder(1,8,this.searchInput);
+           },
+           handleDelete(index, row) {
+diff --git a/film_admin/src/pages/Home/children/SnackManage.vue b/film_admin/src/pages/Home/children/SnackManage.vue
+index dc5160b..30898f8 100644
+--- a/film_admin/src/pages/Home/children/SnackManage.vue
++++ b/film_admin/src/pages/Home/children/SnackManage.vue
+@@ -3,7 +3,7 @@
+       <!--搜索-->
+       <div class="top">
+         <el-col :span="12">
+-          <el-input placeholder="请输入内容" v-model="input" class="input-with-select" style="width: 100%">
++          <el-input placeholder="请输入内容" v-model="keyword" class="input-with-select" style="width: 100%">
+             <el-button slot="append" icon="el-icon-search" @click="search">搜索</el-button>
+           </el-input>
+         </el-col>
+@@ -160,7 +160,7 @@
+             dialogFormVisible:false,
+             dialogTitle:'',
+             labelPosition:'right',
+-            input:'',
++            input
+             searchInput:'',
+             addcinemaId:'',
+             cinemaList:[],
+@@ -188,8 +188,8 @@
+           this.loadCurrentPageSnack(this.currentPage,8,'');
+         },
+         methods: {
+-          async loadCurrentPageSnack(pageNum,limit,input){
+-            let json = await getSnacks(pageNum,limit,input);
++          async loadCurrentPageSnack(pageNum,limit,keyword){
++            let json = await getSnacks(pageNum,limit,keyword);
+             if (json.state===200){
+               this.tableData = json.data.beanList;
+               this.total = json.data.tr;
+@@ -275,7 +275,7 @@
+           },
+           //搜索小吃
+           search(){
+-            this.searchInput = this.input;
++            this.searchInput = this.keyword;
+             this.loadCurrentPageSnack(1,8,this.searchInput);
+           },
+           //添加小吃
+diff --git a/film_admin/src/pages/Home/children/UserManage.vue b/film_admin/src/pages/Home/children/UserManage.vue
+index fb9e0af..89a6061 100644
+--- a/film_admin/src/pages/Home/children/UserManage.vue
++++ b/film_admin/src/pages/Home/children/UserManage.vue
+@@ -5,7 +5,7 @@
+       <el-col :span="12">
+         <el-input
+           placeholder="请输入内容"
+-          v-model="input"
++          v-model="keyword"
+           class="input-with-select"
+           clearable
+           style="width: 100%"
+@@ -153,7 +153,7 @@ export default {
+     },
+     //搜索用户
+     search() {
+-      this.searchInput = this.input;
++      this.searchInput = this.keyword;
+       this.loadCurrentPageUser(1, 8, this.searchInput);
+     },
+   }

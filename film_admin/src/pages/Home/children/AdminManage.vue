@@ -114,7 +114,7 @@ export default {
       dialogFormVisible: false,
       dialogTitle: "",
       labelPosition: "right",
-      input: "",
+      keyword: "",
       searchInput: "",
       cinemaList: [],
       roleList: [],

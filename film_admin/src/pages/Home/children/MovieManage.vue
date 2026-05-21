@@ -304,7 +304,7 @@
             dialogFormVisible:false,
             dialogTitle:'',
             labelPosition:'right',
-            input:'',
+            keyword:'',
             searchInput:'',
             loadingDialogFormVisible:false,
             rules:{

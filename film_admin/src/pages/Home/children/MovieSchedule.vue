@@ -274,9 +274,9 @@
               }
             });
           },
-          //搜索电影
+          //搜索排片
           search(){
-            this.searchInput = this.input;
+            this.searchInput = this.keyword;
             this.loadCurrentPageMovieSchedule(1,8,this.searchInput);
           },
           //新增电影排片

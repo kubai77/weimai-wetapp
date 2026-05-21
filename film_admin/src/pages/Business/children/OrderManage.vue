@@ -3,7 +3,7 @@
     <!--搜索-->
     <div class="top">
       <el-col :span="12">
-        <el-input placeholder="请输入订单号" v-model="input" class="input-with-select" style="width: 100%">
+        <el-input placeholder="请输入订单号" v-model="keyword" class="input-with-select" style="width: 100%">
           <el-button slot="append" icon="el-icon-search" @click="search">搜索</el-button>
         </el-input>
       </el-col>

@@ -5,7 +5,7 @@
       <el-col :span="12">
         <el-input
           placeholder="请输入内容"
-          v-model="input"
+          v-model="keyword"
           class="input-with-select"
           clearable
           style="width: 100%"
@@ -153,7 +153,7 @@ export default {
     },
     //搜索用户
     search() {
-      this.searchInput = this.input;
+      this.searchInput = this.keyword;
       this.loadCurrentPageUser(1, 8, this.searchInput);
     },
   }

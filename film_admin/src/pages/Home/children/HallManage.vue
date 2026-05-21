@@ -297,7 +297,7 @@
           },
           //搜索影院
           search(){
-            this.searchInput = this.input;
+            this.searchInput = this.keyword;
             this.loadCurrentPageHall(1,8,this.searchInput);
           },
           cancel(){

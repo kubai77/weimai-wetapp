@@ -128,7 +128,7 @@
           },
           //搜索订单
           search(){
-            this.searchInput = this.input;
+            this.searchInput = this.keyword;
             this.loadCurrentPageOrder(1,8,this.searchInput);
           },
           handleDelete(index, row) {

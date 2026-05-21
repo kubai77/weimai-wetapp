@@ -251,7 +251,7 @@
           },
           //搜索小吃
           search(){
-            this.searchInput = this.input;
+            this.searchInput = this.keyword;
             this.loadCurrentPageSnack(1,8,this.searchInput);
           },
           //添加小吃

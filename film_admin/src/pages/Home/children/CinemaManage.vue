@@ -162,7 +162,7 @@
             newBrand:'',
             addBrandId: '',
             labelPosition:'right',
-            input:'',
+            keyword:'',
             searchInput:'',
             booleanOpitons: [
               {
