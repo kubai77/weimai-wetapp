@@ -169,7 +169,7 @@
                     let json = await upLoadFile(formData);
                     if (json.state===200){
                         if (json.data){
-                            this.bannerInfo.img = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
+                            this.bannerInfo.img = process.env.BASE_API + '/upFile/'+json.data.img;
                         }
                     }else{
                         Message.error(json.message);

@@ -219,7 +219,7 @@
                     let json = await upLoadFile(formData);
                     if (json.state===200){
                         if (json.data){
-                            this.snackInfo.imageUrl = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
+                            this.snackInfo.imageUrl = process.env.BASE_API + '/upFile/'+json.data.img;
                         }
                     }else{
                         Message.error(json.message);

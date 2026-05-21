@@ -510,9 +510,9 @@
             if (json.state==200){
               // this.movieInfo.photosList.push("file:///E:/file/"+json.data.img);
               if (this.dialogTitle === '编辑电影信息') {
-                this.movieInfo.photosList.push("https://mokespace.cn/weimai/upFile/"+json.data.img);
+                this.movieInfo.photosList.push(process.env.BASE_API + "/upFile/"+json.data.img);
               } else{
-                this.newPhotos.push("https://mokespace.cn/weimai/upFile/"+json.data.img);
+                this.newPhotos.push(process.env.BASE_API + "/upFile/"+json.data.img);
               }
             }
             console.log(this.movieInfo)
@@ -542,11 +542,11 @@
                 }
                 if (json.data){
                   if(json.data.img)
-                    this.movieInfo.img = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
+                    this.movieInfo.img = process.env.BASE_API + '/upFile/'+json.data.img;
                   if(json.data.videoImg)
-                    this.movieInfo.videoImg = 'https://mokespace.cn/weimai/upFile/'+json.data.videoImg;
+                    this.movieInfo.videoImg = process.env.BASE_API + '/upFile/'+json.data.videoImg;
                   if(json.data.video)
-                    this.movieInfo.videoUrl = 'https://mokespace.cn/weimai/upFile/'+json.data.video;
+                    this.movieInfo.videoUrl = process.env.BASE_API + '/upFile/'+json.data.video;
                 }
                 //判断是编辑还是添加
                 if (this.dialogTitle === '编辑电影信息') {

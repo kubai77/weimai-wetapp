@@ -1,0 +1,105 @@
+diff --git a/film_admin/config/dev.env.js b/film_admin/config/dev.env.js
+index 1e22973..33555cc 100644
+--- a/film_admin/config/dev.env.js
++++ b/film_admin/config/dev.env.js
+@@ -3,5 +3,6 @@ const merge = require('webpack-merge')
+ const prodEnv = require('./prod.env')
+ 
+ module.exports = merge(prodEnv, {
+-  NODE_ENV: '"development"'
++  NODE_ENV: '"development"',
++  BASE_API: '""'
+ })
+diff --git a/film_admin/config/prod.env.js b/film_admin/config/prod.env.js
+index a6f9976..d29ed5a 100644
+--- a/film_admin/config/prod.env.js
++++ b/film_admin/config/prod.env.js
+@@ -1,4 +1,5 @@
+ 'use strict'
+ module.exports = {
+-  NODE_ENV: '"production"'
++  NODE_ENV: '"production"',
++  BASE_API: '"https://mokespace.cn/weimai"'
+ }
+diff --git a/film_admin/src/api/ajax.js b/film_admin/src/api/ajax.js
+index 4671e73..03c05c5 100644
+--- a/film_admin/src/api/ajax.js
++++ b/film_admin/src/api/ajax.js
+@@ -1,6 +1,6 @@
+ import axios from 'axios'
+ axios.defaults.withCredentials=true
+-axios.defaults.baseURL="https://mokespace.cn/weimai";
++axios.defaults.baseURL = process.env.BASE_API;
+ 
+ //封装ajax
+ export default function ajax(url='',params={},type='GET'){
+diff --git a/film_admin/src/pages/Business/children/SnackManage.vue b/film_admin/src/pages/Business/children/SnackManage.vue
+index 707d8d9..0981b25 100644
+--- a/film_admin/src/pages/Business/children/SnackManage.vue
++++ b/film_admin/src/pages/Business/children/SnackManage.vue
+@@ -219,7 +219,7 @@
+                     let json = await upLoadFile(formData);
+                     if (json.state===200){
+                         if (json.data){
+-                            this.snackInfo.imageUrl = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
++                            this.snackInfo.imageUrl = process.env.BASE_API + '/upFile/'+json.data.img;
+                         }
+                     }else{
+                         Message.error(json.message);
+diff --git a/film_admin/src/pages/Home/children/BannerManage.vue b/film_admin/src/pages/Home/children/BannerManage.vue
+index 3659d8a..d90ddfd 100644
+--- a/film_admin/src/pages/Home/children/BannerManage.vue
++++ b/film_admin/src/pages/Home/children/BannerManage.vue
+@@ -169,7 +169,7 @@
+                     let json = await upLoadFile(formData);
+                     if (json.state===200){
+                         if (json.data){
+-                            this.bannerInfo.img = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
++                            this.bannerInfo.img = process.env.BASE_API + '/upFile/'+json.data.img;
+                         }
+                     }else{
+                         Message.error(json.message);
+diff --git a/film_admin/src/pages/Home/children/MovieManage.vue b/film_admin/src/pages/Home/children/MovieManage.vue
+index 3284dba..3502ca9 100644
+--- a/film_admin/src/pages/Home/children/MovieManage.vue
++++ b/film_admin/src/pages/Home/children/MovieManage.vue
+@@ -510,9 +510,9 @@
+             if (json.state==200){
+               // this.movieInfo.photosList.push("file:///E:/file/"+json.data.img);
+               if (this.dialogTitle === '编辑电影信息') {
+-                this.movieInfo.photosList.push("https://mokespace.cn/weimai/upFile/"+json.data.img);
++                this.movieInfo.photosList.push(process.env.BASE_API + "/upFile/"+json.data.img);
+               } else{
+-                this.newPhotos.push("https://mokespace.cn/weimai/upFile/"+json.data.img);
++                this.newPhotos.push(process.env.BASE_API + "/upFile/"+json.data.img);
+               }
+             }
+             console.log(this.movieInfo)
+@@ -542,11 +542,11 @@
+                 }
+                 if (json.data){
+                   if(json.data.img)
+-                    this.movieInfo.img = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
++                    this.movieInfo.img = process.env.BASE_API + '/upFile/'+json.data.img;
+                   if(json.data.videoImg)
+-                    this.movieInfo.videoImg = 'https://mokespace.cn/weimai/upFile/'+json.data.videoImg;
++                    this.movieInfo.videoImg = process.env.BASE_API + '/upFile/'+json.data.videoImg;
+                   if(json.data.video)
+-                    this.movieInfo.videoUrl = 'https://mokespace.cn/weimai/upFile/'+json.data.video;
++                    this.movieInfo.videoUrl = process.env.BASE_API + '/upFile/'+json.data.video;
+                 }
+                 //判断是编辑还是添加
+                 if (this.dialogTitle === '编辑电影信息') {
+diff --git a/film_admin/src/pages/Home/children/SnackManage.vue b/film_admin/src/pages/Home/children/SnackManage.vue
+index dc5160b..3913bf6 100644
+--- a/film_admin/src/pages/Home/children/SnackManage.vue
++++ b/film_admin/src/pages/Home/children/SnackManage.vue
+@@ -243,7 +243,7 @@
+                     let json = await upLoadFile(formData);
+                     if (json.state===200){
+                         if (json.data){
+-                            this.snackInfo.imageUrl = 'https://mokespace.cn/weimai/upFile/'+json.data.img;
++                            this.snackInfo.imageUrl = process.env.BASE_API + '/upFile/'+json.data.img;
+                         }
+                     }else{
+                         Message.error(json.message);
