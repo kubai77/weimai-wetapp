@@ -1,0 +1,174 @@
+diff --git a/film_admin/config/dev.env.js b/film_admin/config/dev.env.js
+index 1e22973..cfdab44 100644
+--- a/film_admin/config/dev.env.js
++++ b/film_admin/config/dev.env.js
+@@ -3,5 +3,7 @@ const merge = require('webpack-merge')
+ const prodEnv = require('./prod.env')
+ 
+ module.exports = merge(prodEnv, {
+-  NODE_ENV: '"development"'
++  NODE_ENV: '"development"',
++  API_BASE_URL: JSON.stringify(process.env.API_BASE_URL || ''),
++  API_ASSET_BASE_URL: JSON.stringify(process.env.API_ASSET_BASE_URL || process.env.API_BASE_URL || '')
+ })
+diff --git a/film_admin/config/index.js b/film_admin/config/index.js
+index 82080f5..5098f3a 100644
+--- a/film_admin/config/index.js
++++ b/film_admin/config/index.js
+@@ -1,78 +1,50 @@
+ 'use strict'
+-// Template version: 1.3.1
+-// see http://vuejs-templates.github.io/webpack for documentation.
+-
+ const path = require('path')
+ 
++const devProxyTarget = process.env.DEV_PROXY_TARGET || 'http://localhost:8080/'
++
+ module.exports = {
+   dev: {
+-
+-    // Paths
+     assetsSubDirectory: 'static',
+     assetsPublicPath: '/',
+     proxyTable: {
+-      '/': {  //使用"/api"来代替"http://f.apiplus.c"
+-        target: 'http://localhost:8080/', //源地址
+-        changeOrigin: true, //改变源
+-        // pathRewrite: {
+-        //   '^/': '' //路径重写
+-        // }
++      '/admin': {
++        target: devProxyTarget,
++        changeOrigin: true
++      },
++      '/upFile': {
++        target: devProxyTarget,
++        changeOrigin: true
+       }
+     },
+ 
+-    // Various Dev Server settings
+-    host: 'localhost', // can be overwritten by process.env.HOST
+-    port: 8081, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
++    host: 'localhost',
++    port: 8081,
+     autoOpenBrowser: false,
+     errorOverlay: true,
+     notifyOnErrors: true,
+-    poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
++    poll: false,
+ 
+-    
+-    /**
+-     * Source Maps
+-     */
+-
+-    // https://webpack.js.org/configuration/devtool/#development
+     devtool: 'cheap-module-eval-source-map',
+ 
+-    // If you have problems debugging vue-files in devtools,
+-    // set this to false - it *may* help
+-    // https://vue-loader.vuejs.org/en/options.html#cachebusting
+     cacheBusting: true,
+ 
+     cssSourceMap: true
+   },
+ 
+   build: {
+-    // Template for index.html
+     index: path.resolve(__dirname, '../dist/index.html'),
+ 
+-    // Paths
+     assetsRoot: path.resolve(__dirname, '../dist'),
+     assetsSubDirectory: 'static',
+     assetsPublicPath: './',
+-    // assetsPublicPath: '/',
+-
+-    /**
+-     * Source Maps
+-     */
+ 
+     productionSourceMap: true,
+-    // https://webpack.js.org/configuration/devtool/#production
+     devtool: '#source-map',
+ 
+-    // Gzip off by default as many popular static hosts such as
+-    // Surge or Netlify already gzip all static assets for you.
+-    // Before setting to `true`, make sure to:
+-    // npm install --save-dev compression-webpack-plugin
+     productionGzip: false,
+     productionGzipExtensions: ['js', 'css'],
+ 
+-    // Run the build command with an extra argument to
+-    // View the bundle analyzer report after build finishes:
+-    // `npm run build --report`
+-    // Set to `true` or `false` to always turn it on or off
+     bundleAnalyzerReport: process.env.npm_config_report
+   }
+ }
+diff --git a/film_admin/config/prod.env.js b/film_admin/config/prod.env.js
+index 871ec62..0ccfdd4 100644
+--- a/film_admin/config/prod.env.js
++++ b/film_admin/config/prod.env.js
+@@ -1,5 +1,6 @@
+ 'use strict'
+ module.exports = {
+   NODE_ENV: '"production"',
+-  VUE_APP_API_BASE_URL: JSON.stringify(process.env.VUE_APP_API_BASE_URL || 'https://mokespace.cn/weimai')
++  API_BASE_URL: JSON.stringify(process.env.API_BASE_URL || 'https://mokespace.cn/weimai'),
++  API_ASSET_BASE_URL: JSON.stringify(process.env.API_ASSET_BASE_URL || process.env.API_BASE_URL || 'https://mokespace.cn/weimai')
+ }
+diff --git a/film_admin/src/api/ajax.js b/film_admin/src/api/ajax.js
+index dd77bf5..93d4106 100644
+--- a/film_admin/src/api/ajax.js
++++ b/film_admin/src/api/ajax.js
+@@ -1,18 +1,25 @@
+ import axios from 'axios'
+-axios.defaults.withCredentials=true
+-if (process.env.NODE_ENV === 'production') {
+-  axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'https://mokespace.cn/weimai'
+-} else {
+-  axios.defaults.baseURL = ''
++
++const trimTrailingSlash = (url = '') => url.replace(/\/$/, '')
++const isProduction = process.env.NODE_ENV === 'production'
++const apiBaseURL = trimTrailingSlash(process.env.API_BASE_URL || (isProduction ? 'https://mokespace.cn/weimai' : ''))
++
++axios.defaults.withCredentials = true
++axios.defaults.baseURL = apiBaseURL
++
++export const buildAssetUrl = (path = '') => {
++  if (!path || /^https?:\/\//.test(path)) {
++    return path
++  }
++  const assetBaseURL = trimTrailingSlash(process.env.API_ASSET_BASE_URL || apiBaseURL)
++  const normalizedPath = path.charAt(0) === '/' ? path : `/${path}`
++  return `${assetBaseURL}${normalizedPath}`
+ }
+ 
+-//封装ajax
+ export default function ajax(url='',params={},type='GET'){
+   let promise;
+   return new Promise(((resolve, reject) => {
+-    //1.判断请求方式
+     if ('GET'===type){
+-      //1.1拼接字符串
+       let str = '';
+       Object.keys(params).forEach((value,index) => {
+         if (index+1===Object.keys(params).length){
+@@ -21,15 +28,11 @@ export default function ajax(url='',params={},type='GET'){
+           str+=value+'='+params[value]+'&';
+         }
+       });
+-      //1.2完整路径
+       url+='?'+str;
+-      //1.3发送get请求
+       promise = axios.get(url);
+     }else if('POST'===type){
+-      //1.3发送post请求
+       promise = axios.post(url,params);
+     }
+-    //2.返回请求结果
+     promise.then((response)=>{
+       resolve(response.data);
+     }).catch((error)=>{

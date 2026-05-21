@@ -1,18 +1,25 @@
 import axios from 'axios'
-axios.defaults.withCredentials=true
-if (process.env.NODE_ENV === 'production') {
-  axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'https://mokespace.cn/weimai'
-} else {
-  axios.defaults.baseURL = ''
+
+const trimTrailingSlash = (url = '') => url.replace(/\/$/, '')
+const isProduction = process.env.NODE_ENV === 'production'
+const apiBaseURL = trimTrailingSlash(process.env.API_BASE_URL || (isProduction ? 'https://mokespace.cn/weimai' : ''))
+
+axios.defaults.withCredentials = true
+axios.defaults.baseURL = apiBaseURL
+
+export const buildAssetUrl = (path = '') => {
+  if (!path || /^https?:\/\//.test(path)) {
+    return path
+  }
+  const assetBaseURL = trimTrailingSlash(process.env.API_ASSET_BASE_URL || apiBaseURL)
+  const normalizedPath = path.charAt(0) === '/' ? path : `/${path}`
+  return `${assetBaseURL}${normalizedPath}`
 }
 
-//封装ajax
 export default function ajax(url='',params={},type='GET'){
   let promise;
   return new Promise(((resolve, reject) => {
-    //1.判断请求方式
     if ('GET'===type){
-      //1.1拼接字符串
       let str = '';
       Object.keys(params).forEach((value,index) => {
         if (index+1===Object.keys(params).length){
@@ -21,15 +28,11 @@ export default function ajax(url='',params={},type='GET'){
           str+=value+'='+params[value]+'&';
         }
       });
-      //1.2完整路径
       url+='?'+str;
-      //1.3发送get请求
       promise = axios.get(url);
     }else if('POST'===type){
-      //1.3发送post请求
       promise = axios.post(url,params);
     }
-    //2.返回请求结果
     promise.then((response)=>{
       resolve(response.data);
     }).catch((error)=>{
